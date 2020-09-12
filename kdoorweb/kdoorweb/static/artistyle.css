@@ -1,0 +1,152 @@
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    margin: 40px auto;
+    max-width: 650px;
+    line-height: 1.6;
+    font-size: 18px;
+    color: #444;
+    padding: 0 10px;
+}
+
+h1, h2, h3 {
+    line-height: 1.2
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+header h1 {
+    margin: 0;
+}
+
+.page-header {
+    margin-bottom: 1.5em;
+}
+
+.page-header h1, .page-header h2, .page-header h3{
+    margin: 0;
+}
+
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+.even tr:nth-child(even) {
+    background-color: #f5f5f5;
+}
+
+.double tr:nth-child(4n+0) {
+    background-color: #f5f5f5;
+}
+.double tr:nth-child(4n+3) {
+    background-color: #f5f5f5;
+}
+
+.double th:first-child {
+    width: 50%;
+}
+
+.flash {
+    margin: 1em 0;
+    padding: 1em;
+    background: #f6e7db;
+    border: 1px solid #000000;
+}
+
+.errors {
+    margin: 0.1em;
+    padding: 0.1em 0.5em;
+    background: #ffb3b3;
+    border: 1px solid #000000;
+    flex: 100%
+}
+ul.errors {
+  list-style-type: none;
+}
+
+/* Top-down Form
+Label    [Input]
+-----Button-----
+*/
+
+form {
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+form label {
+    flex-basis: 30%;
+}
+
+form input {
+    flex-basis: 70%;
+    margin: 0.4em 0;
+    height: 2em;
+}
+
+form input[type=submit], form input[type=button] {
+    flex-basis: 100%;
+}
+
+form .basis_auto {
+    flex-basis: auto !important;
+}
+
+form textarea {
+    height: 30em;
+    flex-basis: 100%;
+    margin-bottom:0.4em;
+}
+
+/* Inline Form
+Label [Input] Button
+*/
+form.inline {
+    flex-wrap: nowrap;
+    align-content: stretch;
+    align-items: center;
+}
+
+form.inline label, form.inline input {
+    align-self: unset;
+    flex: 1 1 auto;
+    margin: 0 0.3em 1em;
+}
+
+form.inline label,
+form.inline input[type=submit],
+form.inline input[type=reset],
+form.inline input[type=button] {
+    flex: 0 1 auto;
+}

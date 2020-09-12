@@ -1,0 +1,3 @@
+graft update_service/static
+graft update_service/views
+global-exclude *.py[cod]

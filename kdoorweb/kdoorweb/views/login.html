@@ -1,0 +1,15 @@
+% rebase('base.html')
+
+% if error:
+  <p>Error: {{ error }}</p>
+% end
+
+<form action="" method="post">
+    <label for="user">User</label>
+    <input type="text" id="user" name="user">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password">
+
+    <input type="submit" value="Login">
+</form>
