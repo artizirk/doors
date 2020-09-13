@@ -64,3 +64,4 @@ target/
 # Other
 venv/
 *.sqlite
+ad.json

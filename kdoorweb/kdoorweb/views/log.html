@@ -1,0 +1,22 @@
+% rebase('base.html')
+
+<h3>Access log</h3>
+
+<table class="even">
+<thead>
+  <tr>
+    <th>Time</th>
+    <th>Door</th>
+    <th>User</th>
+  </tr>
+</thead>
+<tbody>
+  % for event in events:
+    <tr>
+      <td>{{event["timestamp"]}}</td>
+      <td>{{event["door"]}}</td>
+      <td><a href="/info/{{event['user_id']}}">{{event["user_name"]}}</a></td>
+    </tr>
+  % end
+</tbody>
+</table>

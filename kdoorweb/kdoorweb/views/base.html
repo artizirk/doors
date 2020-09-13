@@ -1,3 +1,4 @@
+% from bottle import request
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,14 +11,21 @@
   <header>
     <h1>K-Space Door system</h1>
     <nav>
-      <a href="/list">Users List</a>
-      <a href="/log">Door Log</a>
-      <a href="/logout">Logout</a>
+      % if request.get("bottle.request.ext.current_user"):
+        <a href="/list">Users</a>
+        % if request.current_user["admin"]:
+          <a href="/doors">Doors</a>
+          <a href="/log">Log</a>
+        % end
+        <a href="/logout">Logout</a>
+      % end
     </nav>
   </header>
   <hr>
 
   {{!base}}
+
+<hr>
 
 </body>
 </html>

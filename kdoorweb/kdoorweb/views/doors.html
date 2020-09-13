@@ -1,0 +1,36 @@
+% rebase('base.html')
+
+<h3>Doors List</h3>
+
+<form method="post">
+  <input name="action" value="Lock All" type="submit">
+  <input name="action" value="Unlock All" type="submit">
+</form>
+
+<table class="double">
+<thead>
+  <tr>
+    <th>Name</th>
+    <th>State</th>
+    <th style="width:10em;">Action</th>
+  </tr>
+</thead>
+<tbody>
+  % for door in doors:
+    <tr>
+      <td>{{door["name"]}}</td>
+      <td>{{door["state"]}}</td>
+      <td>
+        <form method="post">
+          <input name="door_id" value="door['id']" type="hidden">
+          <input name="action" value="Lock" type="submit">
+          <input name="action" value="Unlock" type="submit">
+        </form>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3">{{door["note"]}}</td>
+    </tr>
+  % end
+</tbody>
+</table>

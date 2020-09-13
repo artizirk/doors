@@ -1,0 +1,58 @@
+% rebase('base.html')
+
+<h3>Info {{full_name}}</h3>
+
+<dl style="float:right;">
+  <dt>Disabled</dt>
+  <dd>{{disabled}}</dd>
+  <dt><abbr title="User is in Onboarding AD group">Admin</abbr></dt>
+  <dd>{{admin}}</dd>
+</dl>
+
+<dl>
+  <dt>User</dt>
+  <dd>{{user}}</dd>
+  <dt>Full Name</dt>
+  <dd>{{full_name}}</dd>
+  <dt>Email</dt>
+  <dd>{{email}}</dd>
+</dl>
+
+<h3>Keycards</h3>
+
+<table class="even">
+<thead>
+  <tr>
+    <th>Name</th>
+    <th>Created</th>
+    <th>Disabled</th>
+    <th>Action</th>
+  </tr>
+</thead>
+<tbody>
+  % for keycard in keycards:
+    <tr>
+      <td>{{keycard["name"]}}</td>
+      <td>{{keycard["created"]}}</td>
+      <td>{{keycard["disabled"]}}</td>
+      <td>
+        <form method="post">
+          <input name="keycard_id" value="keycard['id']" type="hidden">
+          <input name="action" value="disable" type="hidden">
+          <input value="Disable" type="submit">
+        </form>
+      </td>
+    </tr>
+  % end
+</tbody>
+</table>
+
+<h4>Add new keycard</h4>
+<form method="post" class="inline">
+  <label for="name">Name: </label>
+  <input id="name" name="name" type="text">
+  <label for="uid">UID: </label>
+  <input id="uid" name="uid" type="text">
+  <input name="action" value="create" type="hidden">
+  <input value="Add" type="submit">
+</form>

@@ -6,15 +6,17 @@
 <thead>
   <tr>
     <th>Name</th>
-    <th>nr of cards</th>
-    <th>Last access</th>
+    <th style="width:4em;">Cards</th>
+    <th style="width:10em;">Last access</th>
   </tr>
 </thead>
 <tbody>
+  % for user in users:
     <tr>
-      <td><a href="/info/1">Arti Zirk</a></td>
-      <td>2</td>
+      <td><a href="/info/{{user['id']}}">{{user["full_name"]}}</a></td>
+      <td>-</td>
       <td>-</td>
     </tr>
+  % end
 </tbody>
 </table>
