@@ -13,8 +13,12 @@
 <tbody>
   % for user in users:
     <tr>
-      <td><a href="/info/{{user['id']}}">{{user["full_name"]}}</a></td>
-      <td>-</td>
+      % if user["disabled"]:
+        <td><s><a href="/info/{{user['id']}}">{{user["full_name"]}}</a></s></td>
+      % else:
+        <td><a href="/info/{{user['id']}}">{{user["full_name"]}}</a></td>
+      % end
+      <td>{{user["cards"]}}</td>
       <td>-</td>
     </tr>
   % end

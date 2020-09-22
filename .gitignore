@@ -65,3 +65,5 @@ target/
 venv/
 *.sqlite
 ad.json
+
+ookean_cards.json

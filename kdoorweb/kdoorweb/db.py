@@ -59,7 +59,8 @@ class DB:
             );
             create table users (
                 id integer primary key,
-                user text,
+                distinguished_name text unique,
+                user text unique,
                 full_name text,
                 email text,
                 disabled integer,
@@ -91,6 +92,7 @@ class DB:
                 door_id integer,
                 keycard_id integer,
                 user_id integer,
+                log_msg text,
 
                 foreign key (door_id)
                     references doors (id)
@@ -116,53 +118,86 @@ class DB:
 
     def add_users(self, users):
         self.db.executemany("""
-        insert into users(user, full_name, email, disabled, admin)
-        values(?, ?, ?, ?, ?)
+            insert into users(distinguished_name, user, full_name, email, disabled, admin)
+            values(?, ?, ?, ?, ?, ?)
         """, users)
         self.db.commit()
 
     def list_users(self):
-        cur = self.db.execute(
-            "select id, user, full_name, email from users"
+        cur = self.db.execute("""
+            select users.id, users.user , users.full_name, users.email, users.disabled, count(k.id) as cards from users
+            left join keycards k on users.id = k.user_id group by users.id order by users.disabled
+        """
         )
         return cur.fetchall()
 
     def get_user(self, user_id):
         cur = self.db.execute(
-            "select * from users where id = ?",
+            "select id, distinguished_name, user, full_name, email, admin, disabled from users where id = ?",
             (user_id, )
         )
         return cur.fetchone()
 
     def get_user_by_name(self, user_name):
         cur = self.db.execute(
-            "select * from users where user = ?",
+            "select id, distinguished_name, user, full_name, email, admin, disabled from users where user = ?",
             (user_name, )
         )
         return cur.fetchone()
+
+    def add_keycards(self, keycards):
+        self.db.executemany("""
+                    insert into keycards(user_id, card_uid, name)
+                    values(?, ?, ?)
+                """, keycards)
+        self.db.commit()
 
     @staticmethod
     def import_ad(json_file):
         with open(json_file) as fp:
             json_data = json.load(fp)
         for user, fields in json_data.items():
-            if fields.get("considered_active", False) and \
-                    fields.get("groups", {}).get("floor_access", False):
-                yield (
-                    user,
-                    fields.get("full_name"),
-                    fields.get("personal_mail"),
-                    0,
-                    int(fields.get("groups",{}).get("onboarding", False))
-                )
+            yield (
+                fields.get("distinguished_name"),
+                fields.get("username"),
+                fields.get("full_name"),
+                fields.get("personal_mail"),
+                0 if fields.get("considered_active") is True and
+                     fields.get("groups", {}).get("floor_access") is not False else 1,
+                0 if fields.get("groups",{}).get("onboarding") is False else 1
+            )
+
+    def import_ookean(self, json_file):
+        unmatched = {}
+        with open(json_file) as fp:
+            json_data = json.load(fp)
+        for user, tokens in json_data.items():
+            self.db.execute("PRAGMA case_sensitive_like = true")
+            cur = self.db.execute(
+                "select id, user, distinguished_name from users where full_name like ?",
+                (f"%{user}%",)
+            )
+            user_row = cur.fetchone()
+            if user_row:
+                print(f"User {user:20} matched with {user_row['user']:20} ({user_row['distinguished_name']})")
+
+                self.add_keycards(((user_row["id"], card["uid"], card["descr"]) for card in tokens))
+            else:
+                unmatched[user] = tokens
+
+        print(f"Cound not match {len(unmatched)} users")
+        for user in unmatched:
+            print(f"User {user}")
 
 
 
+    def export_db(self, json_file):
+        for user in self.list_users():
+            pass
 
 
-
-if __name__ == "__main__":
-    dbfile = "../kdoorweb.sqlite"
+def initdb():
+    dbfile = "kdoorweb.sqlite"
     import os, sys
     from pprint import pprint
     try:
@@ -175,3 +210,13 @@ if __name__ == "__main__":
     users = db.list_users()
     for user in users:
         print(dict(user))
+
+
+def import_ookean():
+    dbfile = "kdoorweb.sqlite"
+    db = DB(dbfile)
+    db.import_ookean("../contrib/ookean_cards.json")
+
+
+if __name__ == "__main__":
+    initdb()

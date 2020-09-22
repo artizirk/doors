@@ -82,7 +82,10 @@ def login():
 @app.post('/login', skip=[check_auth])
 def do_login(db):
     user_name = request.forms.get("user")
+    from pprint import pprint
+    pprint(db.list_users())
     user = db.get_user_by_name(user_name)
+    print("user:", user)
     if user:
         print(f"user {dict(user)}")
         login_user(user["id"])
