@@ -193,11 +193,18 @@ class DB:
         for user in unmatched:
             print(f"User {user}")
 
-
-
-    def export_db(self, json_file):
-        for user in self.list_users():
-            pass
+    def export_db(self):
+        users = {}
+        cur = self.db.execute("select id, distinguished_name, user, full_name, email, disabled, admin from users")
+        for user in cur.fetchall():
+            users[user["full_name"]] = dict(user)
+            del users[user["full_name"]]["id"]
+            cards_cur = self.db.execute(
+                "select card_uid, name, created, disabled from keycards where user_id = ?",
+                (user["id"],)
+            )
+            users[user["full_name"]]["keycards"] = [dict(keycard) for keycard in cards_cur.fetchall()]
+        return users
 
 
 def initdb():
@@ -220,6 +227,16 @@ def import_ookean():
     dbfile = "kdoorweb.sqlite"
     db = DB(dbfile)
     db.import_ookean("../contrib/ookean_cards.json")
+
+
+def export_db():
+    dbfile = "kdoorweb.sqlite"
+    db = DB(dbfile)
+    import sys
+    exports = db.export_db()
+    json.dump(exports, sys.stdout, indent=2)
+    sys.stdout.write("\n")
+
 
 
 if __name__ == "__main__":

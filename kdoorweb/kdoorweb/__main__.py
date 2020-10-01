@@ -21,6 +21,10 @@ if __name__ == "__main__":
             from .db import import_ookean
             import_ookean()
             sys.exit(1)
+        elif cmd == "export_db":
+            from .db import export_db
+            export_db()
+            sys.exit(1)
         else:
             try:
                 port = int(sys.argv[1])
