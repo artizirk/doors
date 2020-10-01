@@ -145,6 +145,9 @@ class DB:
         )
         return cur.fetchone()
 
+    def add_keycard(self, user_id, card_uid, name):
+        self.add_keycards([(user_id, card_uid, name)])
+
     def add_keycards(self, keycards):
         self.db.executemany("""
                     insert into keycards(user_id, card_uid, name)
@@ -154,6 +157,24 @@ class DB:
 
     def get_user_keycards(self, user_id):
         cur = self.db.execute("select id, name, created, disabled from keycards where user_id = ?", (user_id,))
+        return cur.fetchall()
+
+    def list_all_keycards(self):
+        cur = self.db.execute("""
+            select
+                users.id as user_id,
+                users.user as user,
+                users.full_name as full_name,
+                k.id as card_id,
+                k.card_uid as card_uid
+            from users
+            join
+                keycards k on users.id = k.user_id
+            where
+                (users.disabled = 0 or users.disabled is null)
+            and
+                (k.disabled is 0 or k.disabled is null)
+        """)
         return cur.fetchall()
 
     @staticmethod

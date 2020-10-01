@@ -152,3 +152,9 @@ def log(db):
 @view("doors.html")
 def doors(db):
     return {"doors":[]}
+
+
+# FIXME: Add door api auth
+@app.route("/api/v1/cards", skip=[check_auth])
+def api_list_cards(db):
+    return {"keycards":[dict(card) for card in db.list_all_keycards()]}
