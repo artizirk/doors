@@ -152,6 +152,10 @@ class DB:
                 """, keycards)
         self.db.commit()
 
+    def get_user_keycards(self, user_id):
+        cur = self.db.execute("select id, name, created, disabled from keycards where user_id = ?", (user_id,))
+        return cur.fetchall()
+
     @staticmethod
     def import_ad(json_file):
         with open(json_file) as fp:

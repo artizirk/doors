@@ -128,7 +128,8 @@ def info(db, user_id):
     user = db.get_user(user_id)
     if not user:
         raise HTTPError(404, "User does not exist")
-    return {**user, "keycards": []}
+    keycards = db.get_user_keycards(user_id)
+    return {**user, "keycards": keycards}
 
 
 @app.route("/log")
