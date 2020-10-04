@@ -27,8 +27,10 @@ class Decoder:
         else:
             self.pi = False
 
-        self.gpio_0 = 17 #settings.WIEGAND[0]
-        self.gpio_1 = 18 #settings.WIEGAND[1]
+        self.gpio_0 = 17  #settings.WIEGAND[0]
+        self.gpio_1 = 18  #settings.WIEGAND[1]
+        self.door_pin = 21  # from settings.py
+        self.button_pin = 13  # from settings.py
 
         self.callback = callback
 
@@ -39,12 +41,16 @@ class Decoder:
         if self.pi:
             self.pi.set_mode(self.gpio_0, pigpio.INPUT)
             self.pi.set_mode(self.gpio_1, pigpio.INPUT)
+            self.pi.set_mode(self.door_pin, pigpio.OUTPUT)
+            self.pi.set_mode(self.button_pin, pigpio.INPUT)
 
             self.pi.set_pull_up_down(self.gpio_0, pigpio.PUD_UP)
             self.pi.set_pull_up_down(self.gpio_1, pigpio.PUD_UP)
+            self.pi.set_pull_up_down(self.button_pin, pigpio.PUD_UP)
 
             self.cb_0 = self.pi.callback(self.gpio_0, pigpio.FALLING_EDGE, self._cb)
             self.cb_1 = self.pi.callback(self.gpio_1, pigpio.FALLING_EDGE, self._cb)
+            self.button_cb_h = self.pi.callback(self.button_pin, pigpio.FALLING_EDGE, self._cb)
 
     def cut_empty(self, item):
         if item[0:8] == "00000000":
@@ -125,6 +131,14 @@ class Decoder:
         except Exception as e:
             logging.error("Wiegand callback error: " + str(e))
 
+    def button_cb(self,  gpio_pin, level, tick):
+        print("button: gpio_pin:{}, level:{}, tick:{}".format(gpio_pin, level, tick))
+
+    def open_door(self):
+        self.pi.write(self.door_pin, 1)
+        sleep(3)
+        self.pi.write(self.door_pin, 0)
+
     def cancel(self):
 
         """
@@ -133,9 +147,8 @@ class Decoder:
 
         self.cb_0.cancel()
         self.cb_1.cancel()
+        self.button_cb_h.cancel()
         self.pi.stop()
-
-
 
 
 if __name__ == "__main__":
@@ -150,9 +163,11 @@ if __name__ == "__main__":
         cards[user["card_uid"].strip()] = user
 
     def wiegand_callback(bits, value):
-        print("bits", bits)
-        print("value", value)
-        print("user", cards.get(value))
+        print("bits", bits, "value", value)
+        u = cards.get(value)
+        if u:
+            print("user", u)
+            w.open_door()
 
     logging.basicConfig(level=logging.DEBUG)
 
@@ -160,6 +175,10 @@ if __name__ == "__main__":
     w = Decoder(wiegand_callback)
     from time import sleep
     while 1:
-        sleep(1)
+        try:
+            sleep(1)
+        except KeyboardInterrupt as e:
+            w.cancel()
+            break
 
 

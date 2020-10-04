@@ -5,6 +5,7 @@ from bottle import Bottle, view, TEMPLATE_PATH, static_file, \
     request, redirect, response, HTTPError
 
 from .db import SQLitePlugin
+from .api import api
 
 application = app = Bottle()
 
@@ -49,8 +50,13 @@ def check_auth(callback):
     return wrapper
 
 
-app.install(SQLitePlugin(SQLITE_PATH))
+db_plugin = SQLitePlugin(SQLITE_PATH)
+
+app.install(db_plugin)
 app.install(check_auth)
+
+api.install(db_plugin)
+app.mount("/api/v1", api)
 
 
 @app.route('/static/<path:path>', skip=[check_auth])
@@ -152,9 +158,3 @@ def log(db):
 @view("doors.html")
 def doors(db):
     return {"doors":[]}
-
-
-# FIXME: Add door api auth
-@app.route("/api/v1/cards", skip=[check_auth])
-def api_list_cards(db):
-    return {"keycards":[dict(card) for card in db.list_all_keycards()]}
