@@ -5,7 +5,7 @@ from bottle import Bottle, view, TEMPLATE_PATH, static_file, \
     request, redirect, response, HTTPError
 
 from .db import SQLitePlugin
-from .api import api
+from .api import api, check_api_auth
 
 application = app = Bottle()
 
@@ -56,6 +56,7 @@ app.install(db_plugin)
 app.install(check_auth)
 
 api.install(db_plugin)
+api.install(check_api_auth)
 app.mount("/api/v1", api)
 
 

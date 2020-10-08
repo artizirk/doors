@@ -83,7 +83,7 @@ class DB:
             );
             create table doors (
                 id integer primary key,
-                name text,
+                name text unique,
                 note text,
                 api_key text,
                 created text,
@@ -179,6 +179,24 @@ class DB:
                 (k.disabled is 0 or k.disabled is null)
         """)
         return cur.fetchall()
+
+    def add_door(self, name, note, api_key):
+        self.add_doors([name, note, api_key, ])
+
+    def add_doors(self, doors):
+        self.db.executemany("""
+                    insert into doors(name, note, api_key, created, disabled)
+                    values(?, ?, ?, ?, ?)
+                """, doors)
+        self.db.commit()
+
+    def get_door(self, door_id):
+        cur = self.db.execute("select id, name, note, api_key, created, disabled from doors where id = ?", (door_id,))
+        return cur.fetchone()
+
+    def get_door_by_name(self, name):
+        cur = self.db.execute("select id, name, note, api_key, created, disabled from doors where name = ?", (name,))
+        return cur.fetchone()
 
     @staticmethod
     def import_ad(json_file):

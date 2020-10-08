@@ -1,29 +1,33 @@
-from bottle import Bottle, request, response
+import hashlib
+from functools import partial
+
+from bottle import Bottle, request, response, HTTPError
 
 
 api = Bottle()
 
+scrypt = partial(hashlib.scrypt, n=16384, r=8, p=1)
 
-# FIXME: Fix door api auth
+
 def check_api_auth(callback):
     def wrapper(*args, **kwargs):
         print("check api auth")
+        user, api_key = request.auth or (None, None)
         if "db" not in kwargs:
-            request.current_user = None
-            return callback(*args, **kwargs)
-        user = None
-        request.current_user = user
-        if user:
-            print(f"logged in as {user['user']}")
-            print(request.current_user)
+            return "Auth not possible, db not available"
+        user = kwargs["db"].get_door_by_name_and_api_key(user) or {}
+        stored_hash, salt = dict(user).get("api_key", ":").split(":")
+        api_hash = scrypt(api_key, salt=salt)
+        if user and api_hash  == api_key:
+            request.current_door = user
+            print(f"logged in as {user['name']}")
+            print(user)
             return callback(*args, **kwargs)
         else:
             print("not logged in")
             return "Invalid authentication"
     return wrapper
 
-# FIXME: db plugin not available yet
-api.install(check_api_auth)
 
 @api.route("/")
 def index():
