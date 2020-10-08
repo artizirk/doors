@@ -238,7 +238,7 @@ def initdb():
         pass
     DB.create_db(dbfile)
     db = DB(dbfile)
-    db.add_users(db.import_ad("../ad.json"))
+    db.add_users(db.import_ad("ad.json"))
     users = db.list_users()
     for user in users:
         print(dict(user))

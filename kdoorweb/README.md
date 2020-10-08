@@ -16,7 +16,15 @@
 ## Run dev server
 
     source venv/bin/activate
+    python -m kdoorweb
+
+Or
+
     bottle.py --debug --reload kdoorweb:application
+
+To set the TCP port number add it as the last argument
+
+    python -m kdoorweb 8888
 
 ## Run unittests
 
