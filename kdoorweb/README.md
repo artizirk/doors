@@ -9,7 +9,8 @@
 ## Initialize database
 
     source venv/bin/activate
-
+    curl http://172.21.43.1:5000/user > ad.json
+    python3 -m kdoorweb initdb
 
 
 ## Run dev server
