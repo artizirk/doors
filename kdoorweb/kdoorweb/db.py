@@ -51,7 +51,10 @@ class DB:
 
     @staticmethod
     def create_db(dbfile):
-        db = sqlite3.connect(dbfile)
+        if type(dbfile) is DB:
+            db = dbfile.db
+        else:
+            db = sqlite3.connect(dbfile)
         db.executescript("""
             create table versions (
                 version integer,
