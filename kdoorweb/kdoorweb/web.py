@@ -138,6 +138,14 @@ def info(db, user_id):
     return {**user, "keycards": keycards}
 
 
+@app.post("/info/<user_id>")
+def add_key_card(db, user_id):
+    card_name = request.forms.get("name")
+    card_uid = request.forms.get("uid")
+    db.add_keycard(user_id, card_uid, card_name)
+    redirect("/info/" + user_id)
+
+
 @app.route("/log")
 @view("log.html")
 def log(db):
