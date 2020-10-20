@@ -198,6 +198,10 @@ class DB:
         cur = self.db.execute("select id, name, note, api_key, created, disabled from doors where name = ?", (name,))
         return cur.fetchone()
 
+    def get_doors(self):
+        cur = self.db.execute("select name, note, disabled from doors")
+        return cur.fetchall()
+
     @staticmethod
     def import_ad(json_file):
         with open(json_file) as fp:
@@ -210,7 +214,7 @@ class DB:
                 fields.get("personal_mail"),
                 0 if fields.get("considered_active") is True and
                      fields.get("groups", {}).get("floor_access") is not False else 1,
-                0 if fields.get("groups",{}).get("onboarding") is False else 1
+                0 if fields.get("groups", {}).get("onboarding") is False else 1
             )
 
     def import_ookean(self, json_file):
