@@ -181,7 +181,7 @@ class DB:
         return cur.fetchall()
 
     def add_door(self, name, note, api_key):
-        self.add_doors([name, note, api_key, ])
+        self.add_doors([name, note, api_key, str(datetime.datetime.now()), False])
 
     def add_doors(self, doors):
         self.db.executemany("""
