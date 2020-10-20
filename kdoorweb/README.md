@@ -26,6 +26,25 @@ To set the TCP port number add it as the last argument
 
     python -m kdoorweb 8888
 
+
+# Notification server
+
+You need a nginx server with nchan module to send realtime events
+to the kdoorpi part of the project
+
+example nchan conf snippet
+
+```
+location ~ /notify/(\w+)$ {
+    nchan_pubsub;
+    nchan_channel_id $1;
+    nchan_store_messages off;
+}
+location /notify_status {
+    nchan_stub_status;
+}
+```
+
 ## Run unittests
 
     source venv/bin/activate
