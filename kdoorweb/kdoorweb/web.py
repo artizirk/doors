@@ -6,6 +6,7 @@ from bottle import Bottle, view, TEMPLATE_PATH, static_file, \
 
 from .db import SQLitePlugin
 from .api import api, check_api_auth
+from .utils import gen_new_api_key
 
 application = app = Bottle()
 
@@ -168,3 +169,19 @@ def log(db):
 def doors(db):
     doors = db.get_doors()
     return {"doors": doors}
+
+
+@app.post("/doors/<door_id>")
+def door_action(db, door_id):
+    print("door action for door_id", door_id, request.forms.get("action"))
+    redirect("/doors")
+
+
+@app.post("/doors")
+@view("doors_show_api_key.html")
+def add_door(db):
+    name = request.forms.get("name")
+    note = request.forms.get("note")
+    key, hash_line = gen_new_api_key()
+    db.add_door(name, note, hash_line)
+    return {"api_user": name, "api_key": key, "note": note}

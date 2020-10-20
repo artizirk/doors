@@ -181,7 +181,7 @@ class DB:
         return cur.fetchall()
 
     def add_door(self, name, note, api_key):
-        self.add_doors([name, note, api_key, str(datetime.datetime.now()), False])
+        self.add_doors([(name, note, api_key, str(datetime.datetime.now()), False)])
 
     def add_doors(self, doors):
         self.db.executemany("""
@@ -199,7 +199,7 @@ class DB:
         return cur.fetchone()
 
     def get_doors(self):
-        cur = self.db.execute("select name, note, disabled from doors")
+        cur = self.db.execute("select id, name, note, disabled from doors")
         return cur.fetchall()
 
     @staticmethod
