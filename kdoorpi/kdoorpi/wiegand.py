@@ -1,12 +1,12 @@
 #!/bin/python
 import logging
-from smartcard.util import toHexString
-#import settings
+from time import sleep
 
 try:
     import pigpio
 except Exception:
     pigpio = False
+
 
 class Decoder:
     """
@@ -58,7 +58,6 @@ class Decoder:
         else:
             return item
 
-
     def get_hex(self):
         try:
             items = self.items
@@ -70,7 +69,7 @@ class Decoder:
             bits = []
             for i in range(len(items), 0, -8):
                 bits.append(int(items[i - 8:i], 2))
-            return toHexString(bits)
+            return (" ".join(map(lambda a: "%-0.2X" % ((a + 256) % 256), bits))).rstrip()
 
         except ValueError:
             logging.error("Wiegand convert error: bin to hex convertion ended with ValeError. raw: " + str(self.items))
@@ -149,36 +148,3 @@ class Decoder:
         self.cb_1.cancel()
         self.button_cb_h.cancel()
         self.pi.stop()
-
-
-if __name__ == "__main__":
-    from urllib.request import urlopen
-    import json
-
-    print("downloading users list")
-    r = urlopen("http://127.0.0.1:8080/api/v1/cards")
-    users = json.loads(r.read().decode())["keycards"]
-    cards = {}
-    for user in users:
-        cards[user["card_uid"].strip()] = user
-
-    def wiegand_callback(bits, value):
-        print("bits", bits, "value", value)
-        u = cards.get(value)
-        if u:
-            print("user", u)
-            w.open_door()
-
-    logging.basicConfig(level=logging.DEBUG)
-
-    print("Running")
-    w = Decoder(wiegand_callback)
-    from time import sleep
-    while 1:
-        try:
-            sleep(1)
-        except KeyboardInterrupt as e:
-            w.cancel()
-            break
-
-
