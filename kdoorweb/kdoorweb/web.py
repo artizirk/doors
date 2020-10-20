@@ -166,4 +166,5 @@ def log(db):
 @app.route("/doors")
 @view("doors.html")
 def doors(db):
-    return {"doors":[]}
+    doors = db.get_doors()
+    return {"doors": doors}
